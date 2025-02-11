@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import ConfirmationModal from "./close"; // Import the new modal
 
 const questions = [
   {
@@ -12,17 +13,6 @@ const questions = [
     ],
     correctAnswer: "Responding quickly and solving issues efficiently",
   },
-  {
-    question:
-      "Which of the following is the most important factor in providing excellent customer service?",
-    options: [
-      "Avoiding customer interaction",
-      "Ignoring customer complaints",
-      "Responding quickly and solving issues efficiently",
-      "Selling products without understanding customer needs",
-    ],
-    correctAnswer: "Avoiding customer interaction",
-  },
   // Add more questions here
 ];
 
@@ -32,6 +22,7 @@ export default function QuizModal({ onClose }: { onClose: () => void }) {
   const [timeLeft, setTimeLeft] = useState(30);
   const [progress, setProgress] = useState(0);
   const [isSubmitted, setIsSubmitted] = useState(false);
+  const [showConfirmationModal, setShowConfirmationModal] = useState(false); // State for confirmation modal
 
   useEffect(() => {
     if (timeLeft === 0) {
@@ -68,6 +59,19 @@ export default function QuizModal({ onClose }: { onClose: () => void }) {
     setIsSubmitted(true);
   };
 
+  const handleCancelQuiz = () => {
+    setShowConfirmationModal(true); // Show the confirmation modal
+  };
+
+  const handleConfirmCancel = () => {
+    setShowConfirmationModal(false); // Hide the confirmation modal
+    onClose(); // Close the quiz
+  };
+
+  const handleCancelCancel = () => {
+    setShowConfirmationModal(false); // Hide the confirmation modal
+  };
+
   const getOptionStyle = (option: string) => {
     if (!isSubmitted) {
       // If not submitted, highlight the selected answer
@@ -86,7 +90,15 @@ export default function QuizModal({ onClose }: { onClose: () => void }) {
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center">
-      <div className="bg-white p-6 rounded-lg w-1/2">
+      <div className="bg-white p-6 rounded-lg w-1/2 relative">
+        {/* Cancel Button */}
+        <button
+          className="absolute top-2 right-2 bg-red-500 text-white px-3 py-1 rounded"
+          onClick={handleCancelQuiz}
+        >
+          Cancel
+        </button>
+
         <h2 className="text-xl font-bold mb-4">
           {questions[currentQuestion].question}
         </h2>
@@ -130,6 +142,13 @@ export default function QuizModal({ onClose }: { onClose: () => void }) {
           ></div>
         </div>
       </div>
+
+      {/* Confirmation Modal */}
+      <ConfirmationModal
+        isOpen={showConfirmationModal}
+        onConfirm={handleConfirmCancel}
+        onCancel={handleCancelCancel}
+      />
     </div>
   );
 }
